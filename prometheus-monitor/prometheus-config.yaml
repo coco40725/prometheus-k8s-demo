@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: default
+data:
+  prometheus.yaml: |
+    global:
+      scrape_interval: 5s # Server 抓取頻率
+      evaluation_interval: 5s # Server 評估頻率
+      external_labels:
+        monitor: "my-monitor"
+    rule_files: #如何整併數據或建立告警條件
+      - "alert.rules"
+      - "nginx.rules"
+    scrape_configs: # 去哪邊蒐集資料
+      - job_name: "prometheus"
+        metrics_path: "prometheus/metrics"
+        scheme: https
+        static_configs:
+          - targets: ["www.myexample.com.tw"] 
+            
+      - job_name: "prometheus-k8s-demo"
+        metrics_path: "prometheus-k8s-demo/q/metrics"
+        scheme: https
+        static_configs:
+          - targets: ["www.myexample.com.tw"]
+            
+      - job_name: "intelligent-scheduling-system-bg"
+        metrics_path: "intelligent-scheduling-system-bg/q/metrics"
+        scheme: https
+        static_configs:
+          - targets: [ "www.myexample.com.tw" ]

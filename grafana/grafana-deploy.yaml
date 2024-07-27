@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-server
+  labels:
+    app: grafana-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana-server
+  template:
+    metadata:
+      name: grafana-server
+      labels:
+        app: grafana-server
+    spec:
+      securityContext:
+        runAsUser: 0 # 用 user = root 來執行, 這樣才能存取 /var/lib/grafana
+      containers:
+        - name: grafana-server
+          image: grafana/grafana-enterprise
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: storage
+            - mountPath: /etc/grafana
+              name: grafana-config
+
+          env:
+          - name: GF_SECURITY_ADMIN_USER
+            value: xxx
+          - name: GF_SECURITY_ADMIN_PASSWORD
+            value: xxx
+
+      restartPolicy: Always
+
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: grafana-pvc
+
+        - name: grafana-config
+          configMap:
+            name: grafana-config
+            items:
+              - key: grafana.ini
+                path: grafana.ini
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-service
+  namespace: default
+spec:
+  selector:
+    app: grafana-server
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      name: http
+  type: NodePort

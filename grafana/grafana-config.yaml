@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+data:
+  grafana.ini: |
+    #https://github.com/grafana/grafana/blob/main/conf/defaults.ini
+    #################################### Server ##############################
+    [server]
+    # Protocol (http, https, h2, socket)
+    protocol = http
+    
+    # Minimum TLS version allowed. By default, this value is empty. Accepted values are: TLS1.2, TLS1.3. If nothing is set TLS1.2 would be taken
+    min_tls_version = ""
+    
+    # The ip address to bind to, empty will bind to all interfaces
+    http_addr =
+    
+    # The http port to use
+    http_port = 3000
+    
+    # The public facing domain name used to access grafana from a browser
+    domain = localhost
+    
+    # Redirect to correct domain if host header does not match domain
+    # Prevents DNS rebinding attacks
+    enforce_domain = false
+    
+    serve_from_sub_path = true
+    
+    # The full public facing url
+    root_url = %(protocol)s://%(domain)s:%(http_port)s/grafana
+  

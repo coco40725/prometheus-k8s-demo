@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: prometheus-k8s-demo
+  labels:
+    app: prometheus-k8s-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-k8s-demo
+  template:
+    metadata:
+      name: prometheus-k8s-demo
+      labels:
+        app: prometheus-k8s-demo
+    spec:
+      containers:
+        - name: prometheus-k8s-demo
+          image: asia-east1-docker.pkg.dev/my-project-id/prometheus-k8s-demo/test-image:latest-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              memory: "250Mi"
+              cpu: "100m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-k8s-demo
+  namespace: default
+  labels:
+    app: prometheus-k8s-demo
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: prometheus-k8s-demo
